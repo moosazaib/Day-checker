@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            color: #007BFF;
+            margin-bottom: 5px;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .input-group input, .input-group select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover:enabled {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #a8a8a8;
+            cursor: not-allowed;
+        }
+        .status-container {
+            margin-top: 20px;
+            height: 50px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .status-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            white-space: pre-wrap;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .whats-new-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: transparent;
+            color: #007BFF;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            text-align: left;
+            position: relative;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            color: #007BFF;
+        }
+        .close-button {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .whats-new-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .whats-new-item:last-child {
+            border-bottom: none;
+        }
+        .whats-new-item p {
+            margin: 0;
+        }
+        .try-now-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            align-self: flex-start;
+        }
+        .try-now-button:hover {
+            background-color: #218838;
+        }
+        .button-list {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Day Checker</h1>
+        <p>Here you can check what day of the week a specific date was or will be.</p>
+        <div class="input-group">
+            <select id="languageSelect" aria-label="Select Language">
+                <option value="en">English</option>
+                <option value="ur">Urdu</option>
+                <option value="hi">Hindi</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" id="yearInput" placeholder="Year" inputmode="numeric" aria-label="Enter Year">
+            <input type="text" id="monthInput" placeholder="Month" maxlength="2" inputmode="numeric" aria-label="Enter Month">
+            <input type="text" id="dateInput" placeholder="Date" maxlength="2" inputmode="numeric" aria-label="Enter Day of the Month">
+        </div>
+        <div class="button-group">
+            <button id="clearButton" disabled>Clear</button>
+            <button id="checkButton" disabled>Check</button>
+            <button id="checkTodayButton">Check Today's Day</button>
+        </div>
+        <div class="status-container" id="statusContainer" aria-live="polite">
+            <p class="status-message" id="statusMessage"></p>
+            <div class="loader" id="loader"></div>
+        </div>
+        <button id="whatsNewButton" class="whats-new-button">What's New</button>
+    </div>
+
+    <div id="whatsNewModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div id="modalContent"></div>
+            <button id="closeModalButton" class="close-button">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        const languageSelect = document.getElementById('languageSelect');
+        const monthInput = document.getElementById('monthInput');
+        const dateInput = document.getElementById('dateInput');
+        const yearInput = document.getElementById('yearInput');
+        const clearButton = document.getElementById('clearButton');
+        const checkButton = document.getElementById('checkButton');
+        const checkTodayButton = document.getElementById('checkTodayButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const loader = document.getElementById('loader');
+        const statusMessage = document.getElementById('statusMessage');
+        const whatsNewButton = document.getElementById('whatsNewButton');
+        const whatsNewModal = document.getElementById('whatsNewModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        const translations = {
+            en: {
+                title: 'Day Checker',
+                subtitle: 'Here you can check what day of the week a specific date was or will be.',
+                yearPlaceholder: 'Year',
+                monthPlaceholder: 'Month',
+                datePlaceholder: 'Date',
+                clearButton: 'Clear',
+                checkButton: 'Check',
+                checkTodayButton: "Check Today's Day",
+                checking: 'Checking...',
+                invalidDate: 'On this day, the Gregorian calendar was adopted, and these dates did not exist.',
+                isToday: 'Today is ',
+                days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                yesterday: 'Yesterday was ',
+                tomorrow: 'Tomorrow will be ',
+                wasAnd: 'the day was ',
+                willAnd: 'the day will be ',
+                fullStop: '.',
+                whatsNew: "What's New",
+                modalTitle: "What's New in Day Checker",
+                whatsNewItems: [
+                    {
+                        text: 'This tool is launched as a passion project to provide a simple and elegant way to check the day of the week for any date.',
+                        feature: 'launch'
+                    },
+                    {
+                        text: 'Bug Fix: The date input field now correctly handles leading zeros.',
+                        feature: 'bugfix'
+                    }
+                ],
+                tryNow: 'Try Now',
+                closeButton: 'Close',
+                birthdayMessage: {
+                    pre_2006: 'Moosa Zaib will be born in Karachi on July 31, 2006.',
+                    exact_2006: 'On this very day, Moosa Zaib was born in Karachi.',
+                    post_2006: 'Moosa Zaib was born in Karachi on July 31, 2006.'
+                }
+            },
+            ur: {
+                title: 'دن کا حساب',
+                subtitle: 'یہاں آپ چیک کر سکتے ہیں کہ کسی خاص تاریخ کو ہفتے کا کونسا دن تھا یا ہوگا۔',
+                yearPlaceholder: 'سال',
+                monthPlaceholder: 'مہینہ',
+                datePlaceholder: 'تاریخ',
+                clearButton: 'صاف کریں',
+                checkButton: 'چیک کریں',
+                checkTodayButton: 'آج کا دن چیک کریں',
+                checking: 'چیک کیا جا رہا ہے...',
+                invalidDate: 'اس دن گریگوریئن کیلنڈر اپنایا گیا تھا، اور یہ تاریخیں موجود نہیں تھیں۔',
+                isToday: 'آج ',
+                days: ['اتوار', 'سوموار', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ'],
+                months: ['جنوری', 'فروری', 'مارچ', 'اپریل', 'مئی', 'جون', 'جولائی', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر'],
+                yesterday: 'گزشتہ کل ',
+                tomorrow: 'کل ',
+                wasAnd: ' کو ',
+                willAnd: ' کو ',
+                fullStop: '۔',
+                is: ' ہے',
+                tha: ' تھا',
+                hoga: ' ہوگا',
+                whatsNew: 'کیا نیا ہے',
+                modalTitle: 'ڈے چیکر میں کیا نیا ہے',
+                whatsNewItems: [
+                    {
+                        text: 'اس ٹول کو ایک ذاتی پروجیکٹ کے طور پر لانچ کیا گیا ہے تاکہ کسی بھی تاریخ کے لیے ہفتے کا دن جاننے کا ایک سادہ اور شاندار طریقہ فراہم کیا جا سکے۔',
+                        feature: 'launch'
+                    },
+                    {
+                        text: 'بگ فکس: تاریخ کے ان پٹ فیلڈ میں اب صفر (leading zeros) کا مسئلہ حل کر دیا گیا ہے۔',
+                        feature: 'bugfix'
+                    }
+                ],
+                tryNow: 'ابھی آزمائیں',
+                closeButton: 'بند کریں',
+                birthdayMessage: {
+                    pre_2006: '31 جولائی 2006 کو موسیٰ زیب کراچی میں پیدا ہوگا۔',
+                    exact_2006: 'اسی دن کو موسیٰ زیب کراچی میں پیدا ہوا۔',
+                    post_2006: '31 جولائی 2006 کو موسیٰ زیب کراچی میں پیدا ہوا تھا۔'
+                }
+            },
+            hi: {
+                title: 'दिन का हिसाब',
+                subtitle: 'यहां आप जांच सकते हैं कि किसी विशेष तारीख को सप्ताह का कौन सा दिन था या होगा।',
+                yearPlaceholder: 'साल',
+                monthPlaceholder: 'महीना',
+                datePlaceholder: 'तारीख',
+                clearButton: 'साफ़ करें',
+                checkButton: 'जांचें',
+                checkTodayButton: 'आज का दिन जांचें',
+                checking: 'जांच हो रही है...',
+                invalidDate: 'इस दिन ग्रेगोरियन कैलेंडर अपनाया गया था, और ये तारीखें मौजूद नहीं थीं।',
+                isToday: 'आज ',
+                days: ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'],
+                months: ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'],
+                yesterday: 'कल ',
+                tomorrow: 'आने वाला कल ',
+                wasAnd: 'को ',
+                willAnd: 'को ',
+                fullStop: '।',
+                is: ' है',
+                tha: ' था',
+                hoga: ' होगा',
+                whatsNew: 'नया क्या है',
+                modalTitle: 'डे चेकर में नया क्या है',
+                whatsNewItems: [
+                    {
+                        text: 'इस टूल को एक व्यक्तिगत परियोजना के रूप में लॉन्च किया गया है ताकि किसी भी तारीख के लिए सप्ताह का दिन जानने का एक सरल और शानदार तरीका प्रदान किया जा सके।',
+                        feature: 'launch'
+                    },
+                    {
+                        text: 'बग फिक्स: तारीख के इनपुट फ़ील्ड में अब शून्य (leading zeros) का मुद्दा हल हो गया है।',
+                        feature: 'bugfix'
+                    }
+                ],
+                tryNow: 'अभी आज़माएं',
+                closeButton: 'बंद करें',
+                birthdayMessage: {
+                    pre_2006: '31 जुलाई 2006 को मूसा ज़ैब कराची में पैदा होगा।',
+                    exact_2006: 'उसी दिन को मूसा ज़ैब कराची में पैदा हुआ।',
+                    post_2006: '31 जुलाई 2006 को मूसा ज़ैब कराची में पैदा हुआ था।'
+                }
+            }
+        };
+
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[currentLang];
+            document.querySelector('h1').textContent = t.title;
+            document.querySelector('p').textContent = t.subtitle;
+            yearInput.placeholder = t.yearPlaceholder;
+            monthInput.placeholder = t.monthPlaceholder;
+            dateInput.placeholder = t.datePlaceholder;
+            clearButton.textContent = t.clearButton;
+            checkButton.textContent = t.checkButton;
+            checkTodayButton.textContent = t.checkTodayButton;
+            whatsNewButton.textContent = t.whatsNew;
+            modalTitle.textContent = t.modalTitle;
+            closeModalButton.textContent = t.closeButton;
+            updateModalContent(t);
+        }
+
+        function updateModalContent(t) {
+            modalContent.innerHTML = '';
+            t.whatsNewItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'whats-new-item';
+                
+                const textP = document.createElement('p');
+                textP.textContent = item.text;
+                itemDiv.appendChild(textP);
+                
+                modalContent.appendChild(itemDiv);
+            });
+        }
+        
+        function clearInputs() {
+            yearInput.value = '';
+            monthInput.value = '';
+            dateInput.value = '';
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            if (monthInput.value || dateInput.value || yearInput.value) {
+                clearButton.disabled = false;
+            } else {
+                clearButton.disabled = true;
+            }
+            if (monthInput.value && dateInput.value && yearInput.value) {
+                checkButton.disabled = false;
+            } else {
+                checkButton.disabled = true;
+            }
+        }
+        
+        function filterNumeric(event) {
+            const input = event.target;
+            let value = input.value.replace(/[^0-9]/g, '');
+            if (value.startsWith('0') && value.length > 1) {
+                value = parseInt(value, 10).toString();
+            }
+            input.value = value;
+        }
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        function isLeapYearJulian(year) {
+            return year % 4 === 0;
+        }
+
+        function validateDate() {
+            let day = parseInt(dateInput.value);
+            const month = parseInt(monthInput.value);
+            const year = parseInt(yearInput.value);
+            
+            if (!day || !month || !year) return;
+
+            if (day > 31) {
+                dateInput.value = 31;
+            } else if (day < 1 && dateInput.value.length > 0) {
+                dateInput.value = 1;
+            } else if (month === 2) {
+                const maxDays = (year < 1582 || (year === 1582 && month <= 10)) ? isLeapYearJulian(year) ? 29 : 28 : isLeapYear(year) ? 29 : 28;
+                if (day > maxDays) {
+                    dateInput.value = maxDays;
+                }
+            } else if ([4, 6, 9, 11].includes(month)) {
+                if (day > 30) {
+                    dateInput.value = 30;
+                }
+            }
+            updateButtonState();
+        }
+
+        function getDayOfTheWeek(year, month, day) {
+            if (year === 1582 && month === 10 && day >= 5 && day <= 14) {
+                return null;
+            }
+
+            const daysSinceYearZero = (y, m, d) => {
+                let a = Math.floor((14 - m) / 12);
+                let y1 = y + 4800 - a;
+                let m1 = m + 12 * a - 3;
+                let jdn;
+                if (y < 1582 || (y === 1582 && m < 10) || (y === 1582 && m === 10 && d < 15)) {
+                    jdn = d + Math.floor((153 * m1 + 2) / 5) + 365 * y1 + Math.floor(y1 / 4) - 32083;
+                } else {
+                    jdn = d + Math.floor((153 * m1 + 2) / 5) + 365 * y1 + Math.floor(y1 / 4) - Math.floor(y1 / 100) + Math.floor(y1 / 400) - 32045;
+                }
+                return jdn;
+            };
+
+            const julianDayNumber = daysSinceYearZero(year, month, day);
+            const dayIndex = (julianDayNumber + 1) % 7; 
+            
+            return dayIndex;
+        }
+
+        function processDate(month, date, year) {
+            const t = translations[currentLang];
+            
+            checkButton.disabled = true;
+            checkTodayButton.disabled = true;
+            clearButton.disabled = true;
+            statusMessage.style.display = 'block';
+            statusMessage.textContent = t.checking;
+            loader.style.display = 'block';
+
+            setTimeout(() => {
+                const dayIndex = getDayOfTheWeek(year, month, date);
+                let statusText = '';
+                
+                if (dayIndex === null) {
+                    statusText = t.invalidDate;
+                } else {
+                    const dayName = t.days[dayIndex];
+                    const monthName = t.months[month - 1];
+                    const inputDate = new Date(year, month - 1, date);
+
+                    const isToday = inputDate.setHours(0,0,0,0) === today.setHours(0,0,0,0);
+                    const isYesterday = inputDate.setHours(0,0,0,0) === yesterday.setHours(0,0,0,0);
+                    const isTomorrow = inputDate.setHours(0,0,0,0) === tomorrow.setHours(0,0,0,0);
+
+                    if (isToday) {
+                        if (currentLang === 'en') {
+                            statusText = `Today is ${dayName}, ${monthName} ${date}, ${year}.`;
+                        } else if (currentLang === 'ur') {
+                            statusText = `آج ${dayName}، ${monthName} ${date}، ${year}${t.is}`;
+                        } else {
+                            statusText = `आज ${dayName}, ${monthName} ${date}, ${year}${t.is}`;
+                        }
+                    } else if (isYesterday) {
+                        if (currentLang === 'en') {
+                            statusText = `Yesterday was ${dayName}, ${monthName} ${date}, ${year}.`;
+                        } else if (currentLang === 'ur') {
+                            statusText = `${t.yesterday}${dayName}، ${monthName} ${date}، ${year}${t.tha}`;
+                        } else {
+                            statusText = `${t.yesterday}${dayName}, ${monthName} ${date}, ${year}${t.tha}`;
+                        }
+                    } else if (isTomorrow) {
+                        if (currentLang === 'en') {
+                            statusText = `Tomorrow will be ${dayName}, ${monthName} ${date}, ${year}.`;
+                        } else if (currentLang === 'ur') {
+                            statusText = `${t.tomorrow}${dayName}، ${monthName} ${date}، ${year}${t.hoga}`;
+                        } else {
+                            statusText = `${t.tomorrow}${dayName}, ${monthName} ${date}, ${year}${t.hoga}`;
+                        }
+                    } else {
+                        const isPast = inputDate.setHours(0,0,0,0) < today.setHours(0,0,0,0);
+                        if (isPast) {
+                            if (currentLang === 'en') {
+                                statusText = `${monthName} ${date}, ${year} ${t.wasAnd} ${dayName}.`;
+                            } else if (currentLang === 'ur') {
+                                statusText = `${monthName} ${date}, ${year}${t.wasAnd}${dayName} تھا۔`;
+                            } else {
+                                statusText = `${monthName} ${date}, ${year}${t.wasAnd}${dayName} था।`;
+                            }
+                        } else {
+                            if (currentLang === 'en') {
+                                statusText = `${monthName} ${date}, ${year} ${t.willAnd} ${dayName}.`;
+                            } else if (currentLang === 'ur') {
+                                statusText = `${monthName} ${date}, ${year}${t.willAnd}${dayName} ہوگا۔`;
+                            } else {
+                                statusText = `${monthName} ${date}, ${year}${t.willAnd}${dayName} होगा۔`;
+                            }
+                        }
+                    }
+
+                    // New feature for Moosa Zaib's birthday, now supports all three languages
+                    if (month === 7 && date === 31) {
+                        let birthdayKey = '';
+                        if (year < 2006) {
+                            birthdayKey = 'pre_2006';
+                        } else if (year === 2006) {
+                            birthdayKey = 'exact_2006';
+                        } else { // year > 2006
+                            birthdayKey = 'post_2006';
+                        }
+                        
+                        const birthdayMessage = t.birthdayMessage[birthdayKey];
+                        if (birthdayMessage) {
+                             statusText += '\n' + birthdayMessage;
+                        }
+                    }
+                }
+
+                statusMessage.textContent = statusText;
+                loader.style.display = 'none';
+
+                checkButton.disabled = false;
+                checkTodayButton.disabled = false;
+                updateButtonState();
+            }, 3000);
+        }
+
+        languageSelect.addEventListener('change', (event) => {
+            setLanguage(event.target.value);
+            document.documentElement.lang = event.target.value; 
+        });
+
+        yearInput.addEventListener('input', (event) => {
+            filterNumeric(event);
+            let year = parseInt(yearInput.value);
+            if (year < 1 && yearInput.value.length > 0) {
+                yearInput.value = 1;
+            }
+            validateDate();
+            updateButtonState();
+        });
+
+        monthInput.addEventListener('input', (event) => {
+            filterNumeric(event);
+            let month = parseInt(monthInput.value);
+            if (month > 12) {
+                monthInput.value = 12;
+            } else if (month < 1 && monthInput.value.length > 0) {
+                monthInput.value = 1;
+            }
+            validateDate();
+            updateButtonState();
+        });
+
+        dateInput.addEventListener('input', (event) => {
+            filterNumeric(event);
+            let day = parseInt(dateInput.value);
+            if (day < 1 && dateInput.value.length > 0) {
+                dateInput.value = 1;
+            }
+            validateDate();
+            updateButtonState();
+        });
+        
+        checkButton.addEventListener('click', () => {
+            const month = parseInt(monthInput.value);
+            const date = parseInt(dateInput.value);
+            const year = parseInt(yearInput.value);
+            processDate(month, date, year);
+        });
+
+        checkTodayButton.addEventListener('click', () => {
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const date = today.getDate();
+            processDate(month, date, year);
+        });
+
+        clearButton.addEventListener('click', clearInputs);
+
+        whatsNewButton.addEventListener('click', () => {
+            setLanguage(currentLang);
+            whatsNewModal.style.display = 'flex';
+        });
+
+        closeModalButton.addEventListener('click', () => {
+            whatsNewModal.style.display = 'none';
+        });
+
+        window.onclick = function(event) {
+            if (event.target == whatsNewModal) {
+                whatsNewModal.style.display = 'none';
+            }
+        }
+        
+        setLanguage('en');
+    </script>
+</body>
+</html>
